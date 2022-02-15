@@ -4,13 +4,11 @@
 
 ![](docs/files/xxx2vec2.png){width=600 height=300}
 
-Kết quả hiện ở vùng `small models`, còn `retrofit` nữa là xong (glove và fasttext bỏ qua vì sgns là đủ và tiếng Việt ko cần sub-word embedding).
+Kết quả hiện ở vùng `small models`, còn `retrofit` chưa khám phá (glove bỏ qua vì sgns là đủ tốt, fasttext bỏ qua vì tiếng Việt ko cần sub-word embedding).
 
-Hướng `large models` sẽ dần khám phá dùng với `nnlm` (mô hình ngôn ngữ sử dụng mạng nơ-ron)
+Hướng `large models` sẽ dần khám phá dùng với [`nnlm`](https://github.com/telexyz/nnlm) (mô hình ngôn ngữ sử dụng mạng nơ-ron)
 
 ## TODOs
-
-* Cài đặt lại `binarize` bằng Zig
 
 * Cài đặt lại `josh` bằng Zig
 
@@ -18,13 +16,18 @@ Hướng `large models` sẽ dần khám phá dùng với `nnlm` (mô hình ngô
 
 * Làm hierarchical topic modeling (`docs/_5-text_mining.md`)
 
-
-#### [ >> DOING << ]
-
 * Nghịch `retrofit` với tiếng Việt?
 
 * Optimize nhân ma trận, vector với `openblas`. Cài đặt đúng theo nguyên bản `hogbatch`?
 
+
+#### [ >> DOING << ]
+
+* Cài đặt lại `binarize` bằng Zig
+
+* Triển khai bản `binarize` lên web assembly để demo
+  sau khi `binarize` 256 x f32 vector giờ còn 256-bits và chỉ dùng các phép toán 
+  trên bit như AND, OR, XOR nên tốc độ decode cực nhanh
 
 #### [ DONE ]
 
