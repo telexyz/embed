@@ -11,7 +11,7 @@ pub fn build(b: *std.build.Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
-    const binarize = b.addExecutable("binarize", "src/binarize.zig");
+    const binarize = b.addExecutable("binarize", "src/wordvecs.zig");
     binarize.setTarget(target);
     binarize.setBuildMode(mode);
     binarize.install();
@@ -30,7 +30,7 @@ pub fn build(b: *std.build.Builder) void {
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
-    const exe_tests = b.addTest("src/binarize.zig");
+    const exe_tests = b.addTest("src/wordvecs.zig");
     exe_tests.setTarget(target);
     exe_tests.setBuildMode(mode);
 

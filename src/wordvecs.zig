@@ -1,7 +1,10 @@
 const std = @import("std");
 const util = @import("util.zig");
+const blas = @cImport({
+    @cInclude("cblas.h");
+});
 
-var matrix: []f32 = undefined;
+pub var matrix: []f32 = undefined;
 var text: []const u8 = undefined;
 
 var vocab: std.StringHashMap(usize) = undefined;
@@ -68,4 +71,44 @@ pub inline fn getToken(word: []const u8) usize {
 }
 pub inline fn getWord(token: usize) []const u8 {
     return id2str.items[token];
+}
+
+pub fn main() anyerror!void {
+    try init("data/vocab.vec");
+    defer deinit();
+    binarize();
+}
+
+fn binarize() {
+
+}
+
+fn testBlas() void {
+    // https://github.com/xianyi/blas/wiki/User-Manual
+    var A: [6]f64 = .{ 1.0, 2.0, 1.0, -3.0, 4.0, -1.0 };
+    var B: [6]f64 = .{ 1.0, 2.0, 1.0, -3.0, 4.0, -1.0 };
+    var C: [9]f64 = .{ 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+
+    blas.cblas_dgemm(
+        blas.CblasColMajor,
+        blas.CblasNoTrans,
+        blas.CblasTrans,
+        3,
+        3,
+        2,
+        1,
+        A[0..],
+        3,
+        B[0..],
+        3,
+        2,
+        C[0..],
+        3,
+    );
+
+    var i: usize = 0;
+    while (i < 9) : (i += 1) {
+        std.debug.print("{d} ", .{C[i]});
+    }
+    std.debug.print("\nRun code using blas OK!", .{});
 }
