@@ -288,7 +288,9 @@ inline fn updateGradientsAndOutputVec(
 // Đến mẹo mực để giảm khối lượng tính toán
 // Huấn luyện mini-batching negative sample sharing
 const Vector = std.meta.Vector;
+
 fn batchTraining(batch: []const [2]u16, sampling_table: []const u16, thread_num: usize) void {
+    @setFloatMode(std.builtin.FloatMode.Optimized);
     //
     var begin = thread_num * params.vec_size;
     const gradients = gradients_buffer[begin .. begin + params.vec_size];
