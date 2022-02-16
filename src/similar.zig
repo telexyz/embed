@@ -2,7 +2,7 @@
 
 const std = @import("std");
 const util = @import("util.zig");
-const model = @import("model.zig");
+const wordvecs = @import("wordvecs.zig");
 
 const Result = struct {
     token: usize,
@@ -10,80 +10,16 @@ const Result = struct {
 };
 
 var results: []Result = undefined;
-var matrix: []f32 = undefined;
-var text: []const u8 = undefined;
-
-var vocab: std.StringHashMap(usize) = undefined;
-var id2str: std.ArrayList([]const u8) = undefined;
-
-var vocab_size: usize = undefined;
-var vec_size: u16 = undefined;
-
-pub fn init(filename: []const u8) !void {
-    vocab = std.StringHashMap(usize).init(util.allocator);
-    id2str = std.ArrayList([]const u8).init(util.allocator);
-
-    var file = try std.fs.cwd().openFile(filename, .{});
-    defer file.close();
-
-    text = try file.reader().readAllAlloc(
-        util.allocator,
-        1024 * 1024 * 200, // max 100MB
-    );
-
-    var line_it = std.mem.split(u8, text, "\n");
-    var it = std.mem.tokenize(u8, line_it.next().?, " ");
-
-    vocab_size = try std.fmt.parseInt(usize, it.next().?, 10);
-    vec_size = try std.fmt.parseInt(u16, it.next().?, 10);
-
-    results = try util.allocator.alloc(Result, vocab_size);
-    matrix = try util.allocator.alloc(f32, vocab_size * vec_size);
-
-    var index: usize = 0;
-
-    while (line_it.next()) |line| {
-        if (line.len == 0) break;
-
-        it = std.mem.tokenize(u8, line, " ");
-
-        const word = it.next().?;
-
-        try vocab.put(word, @intCast(usize, id2str.items.len));
-        try id2str.append(word);
-
-        // std.debug.print("{d}\n", .{vocab.get(word)});
-
-        while (it.next()) |v| {
-            matrix[index] = try std.fmt.parseFloat(f32, v);
-            index += 1;
-        }
-    }
-}
-
-fn deinit() void {
-    util.allocator.free(results);
-    util.allocator.free(matrix);
-    util.allocator.free(text);
-
-    vocab.deinit();
-    id2str.deinit();
-}
-
-fn getWordVector(token: usize) []f32 {
-    const begin = token * vec_size;
-    return matrix[begin .. begin + vec_size];
-}
 
 const spaces = "                          ";
 pub fn nBestSimilar(word: []const u8, n_best: u8) ![]Result {
-    const token = vocab.get(word).?;
-    const token_vec = getWordVector(token);
+    const token = wordvecs.getToken(word);
+    const token_vec = wordvecs.getVector(token);
 
     var other_token: usize = 0;
 
-    while (other_token < vocab_size) : (other_token += 1) {
-        const other_vec = getWordVector(other_token);
+    while (other_token < wordvecs.vocab_size) : (other_token += 1) {
+        const other_vec = wordvecs.getVector(other_token);
         const sim = cosineSimilarity(token_vec, other_vec);
 
         // std.debug.print("\n{s} {s}: {d:.5}\n", .{
@@ -98,13 +34,13 @@ pub fn nBestSimilar(word: []const u8, n_best: u8) ![]Result {
         };
     }
 
-    std.sort.sort(Result, results, {}, by_similarity_desc);
+    std.sort.sort(Result, results, {}, orderBySimilarityDesc);
 
     var i: usize = 0;
     while (i < n_best) : (i += 1) {
         if (i % 5 == 0) std.debug.print("\n", .{});
         //
-        const other_word = id2str.items[results[i].token];
+        const other_word = wordvecs.getWord(results[i].token);
         const tab = spaces[0 .. 15 - try std.unicode.utf8CountCodepoints(other_word)];
         std.debug.print("{d:.3} {s} {s} ", .{ results[i].similarity, other_word, tab });
     }
@@ -113,7 +49,7 @@ pub fn nBestSimilar(word: []const u8, n_best: u8) ![]Result {
     return results[0..n_best];
 }
 
-fn by_similarity_desc(context: void, a: Result, b: Result) bool {
+fn orderBySimilarityDesc(context: void, a: Result, b: Result) bool {
     _ = context;
     return a.similarity > b.similarity;
 }
@@ -135,38 +71,22 @@ inline fn cosineSimilarity(vec1: []f32, vec2: []f32) f32 {
     return ab / (@sqrt(a) * @sqrt(b));
 }
 
+fn testRun(filename: []const u8) !void {
+    try wordvecs.init(filename);
+    defer wordvecs.deinit();
+
+    results = try util.allocator.alloc(Result, wordvecs.vocab_size);
+    defer util.allocator.free(results);
+
+    _ = try nBestSimilar("trí_tuệ", 20);
+    _ = try nBestSimilar("thực_hành", 20);
+    _ = try nBestSimilar("hạnh_phúc", 20);
+}
+
 pub fn main() anyerror!void {
-    //
-    try init("data/vocab.vec");
     std.debug.print("\n(( word2vec nhà làm ))\n", .{});
-
-    _ = try nBestSimilar("trí_tuệ", 20);
-
-    _ = try nBestSimilar("thực_hành", 20);
-
-    _ = try nBestSimilar("hạnh_phúc", 20);
-
-    deinit();
-
-    try init("data/wordvec.out");
+    try testRun("data/vocab.vec");
+    //
     std.debug.print("\n(( word2vec nguyên bản ))\n", .{});
-
-    _ = try nBestSimilar("trí_tuệ", 20);
-
-    _ = try nBestSimilar("thực_hành", 20);
-
-    _ = try nBestSimilar("hạnh_phúc", 20);
-
-    deinit();
-
-    // try init("data/ngram2vec_sgns.input");
-    // std.debug.print("\n(( ngram2vec ))\n", .{});
-
-    // _ = try nBestSimilar("trí_tuệ", 20);
-
-    // _ = try nBestSimilar("thực_hành", 20);
-
-    // _ = try nBestSimilar("hạnh_phúc", 20);
-
-    // deinit();
+    try testRun("data/wordvec.out");
 }
