@@ -1,12 +1,8 @@
 ## Big pic
 
-![](docs/files/xxx2vec.png){width=600 height=450}
+![](docs/files/xxx2vec.png)
 
-![](docs/files/xxx2vec2.png){width=600 height=300}
-
-Kết quả hiện ở vùng `small models`, còn `retrofit` chưa khám phá (glove bỏ qua vì sgns là đủ tốt, fasttext bỏ qua vì tiếng Việt ko cần sub-word embedding).
-
-Hướng `large models` sẽ dần khám phá dùng với [`nnlm`](https://github.com/telexyz/nnlm) (mô hình ngôn ngữ sử dụng mạng nơ-ron)
+Kết quả hiện ở vùng `small models` (`retrofit` chưa khám phá, glove bỏ qua vì sgns là đủ tốt, fasttext bỏ qua vì tiếng Việt ko cần sub-word embedding). Vùng `large models` sẽ dần khám phá dùng với [`nnlm`](https://github.com/telexyz/nnlm) (mô hình ngôn ngữ sử dụng mạng nơ-ron)
 
 ## TODOs
 
