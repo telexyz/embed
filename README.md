@@ -1,8 +1,6 @@
-## Big pic
-
 ![](docs/files/xxx2vec.png)
 
-Kết quả hiện ở vùng `small models` (`retrofit` chưa khám phá, glove bỏ qua vì sgns là đủ tốt, fasttext bỏ qua vì tiếng Việt ko cần sub-word embedding). Vùng `large models` sẽ dần khám phá dùng với [`nnlm`](https://github.com/telexyz/nnlm) (mô hình ngôn ngữ sử dụng mạng nơ-ron)
+Kết quả hiện ở vùng `small models` (`retrofit` chưa khám phá, glove bỏ qua vì sgns là đủ tốt, fasttext bỏ qua vì tiếng Việt ko cần sub-word embedding). Vùng `large models` sẽ dần khám phá với [`nnlm`](https://github.com/telexyz/nnlm) (mô hình ngôn ngữ sử dụng mạng nơ-ron)
 
 ## TODOs
 
