@@ -12,8 +12,8 @@ const Id2Str = std.ArrayList([]const u8);
 pub var vocab = Vocab.init(util.allocator);
 pub var id2str = Id2Str.init(util.allocator);
 
-var inputs_outputs: std.ArrayList([2]u16) = undefined;
-var sampling_table: std.ArrayList(u16) = undefined;
+pub var inputs_outputs: std.ArrayList([2]u16) = undefined;
+pub var sampling_table: std.ArrayList(u16) = undefined;
 
 //
 pub fn deinit() void {
@@ -26,7 +26,7 @@ pub fn deinit() void {
 }
 
 //
-fn loadVocab(filename: []const u8) !void {
+pub fn loadVocab(filename: []const u8) !void {
     var file = try std.fs.cwd().openFile(filename, .{});
     defer file.close();
 
@@ -56,7 +56,7 @@ fn loadVocab(filename: []const u8) !void {
 }
 
 //
-fn loadInputsOutputs(filename: []const u8) !void {
+pub fn loadInputsOutputs(filename: []const u8) !void {
     var file = try std.fs.cwd().openFile(filename, .{});
     defer file.close();
 
@@ -86,7 +86,7 @@ fn loadInputsOutputs(filename: []const u8) !void {
 }
 
 //
-fn initSamplingTable() !void {
+pub fn initSamplingTable() !void {
     std.debug.print("\n\nInit sampling table ...\n", .{});
 
     sampling_table = try std.ArrayList(u16).initCapacity(util.allocator, vocab.count() * 200);
