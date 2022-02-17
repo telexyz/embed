@@ -1,5 +1,5 @@
 echo "(( word2vec #nhà_làm ))"
-# zig run src/sampling.zig -O ReleaseFast
+zig run src/sampling.zig -O ReleaseFast
 zig run src/training.zig -O ReleaseFast
 
 # word2vec

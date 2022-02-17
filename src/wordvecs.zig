@@ -79,8 +79,8 @@ pub fn main() anyerror!void {
     binarize();
 }
 
-fn binarize() {
-
+fn binarize() void {
+    // ...
 }
 
 fn testBlas() void {
