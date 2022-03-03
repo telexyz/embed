@@ -23,7 +23,7 @@ pub const params: struct {
     // Các tham số dành cho phần mẹo mực hogbatch #nhà_làm
     // Phần này adhoc, cần kiểm tra lại độ tin cậy
     // Hiện tại nếu để `mini_batch` từ 8 trở lên sẽ làm hỏng việc huấn luyện
-    mini_batch: u8 = 3, // số mẫu gộp chung để train, ko để quá 4, set = 0 để tắt
+    mini_batch: u8 = 4, // số mẫu gộp chung để train, ko để quá 4, = 0 để tắt
 } = .{};
 
 // Đầu vào của nn là one-hot vectors, mỗi one-hot đại diện cho 1 từ trong vocab
@@ -276,10 +276,10 @@ inline fn updateGradientsAndOutputVec(
     desired_output: f32,
     gradients: []f32,
 ) void {
-    const model_output = fastmath.sigmoid(fastmath.dotProduct(hidden_vec, output_vec));
+    const model_output = fastmath.sigmoid(fastmath.dotProduct(params.vec_size, hidden_vec, output_vec));
     const loss = (desired_output - model_output) * alpha;
-    fastmath.vecMulAdd(output_vec, loss, gradients); // output_vec * loss then add to gradients
-    fastmath.vecMulAdd(hidden_vec, loss, output_vec); // hidden_vec * loss then add to output_vec
+    _ = fastmath.vecMulAdd(params.vec_size, output_vec, loss, gradients); // output_vec * loss then add to gradients
+    _ = fastmath.vecMulAdd(params.vec_size, hidden_vec, loss, output_vec); // hidden_vec * loss then add to output_vec
 }
 //
 // Hết phần cơ bản của giải thuật gốc `word2vec.c`
@@ -307,12 +307,12 @@ fn batchTraining(batch: []const [2]u16, sampling_table: []const u16, thread_num:
         // Get random tokens from sampling table
         const rand = prng.random().uintAtMost(usize, sampling_table.len - 1);
         const token = sampling_table[rand];
-        dot_prods[k] = 0; // fastmath.dotProduct(hidden_vec, getVector(token, output_layer));
+        dot_prods[k] = 0; // fastmath.dotProduct(params.vec_size, hidden_vec, getVector(token, output_layer));
         tokens[k] = token;
     }
 
-    var i: usize = 0;
-    while (i < hidden_vec.len) : (i += 4) {
+    comptime var i: usize = 0;
+    inline while (i < params.vec_size) : (i += 4) {
         const a: Vector(4, f32) = .{
             hidden_vec[i],
             hidden_vec[i + 1],
@@ -352,8 +352,8 @@ fn batchTraining(batch: []const [2]u16, sampling_table: []const u16, thread_num:
             if (positive_token != tokens[c]) {
                 output_vec = getVector(tokens[c], output_layer);
                 loss = -fastmath.sigmoid(dot_prods[c]) * alpha;
-                fastmath.vecMulAdd(output_vec, loss, gradients);
-                fastmath.vecMulAdd(hidden_vec, loss, output_vec);
+                _ = fastmath.vecMulAdd(params.vec_size, output_vec, loss, gradients);
+                _ = fastmath.vecMulAdd(params.vec_size, hidden_vec, loss, output_vec);
             }
         }
     } // for batch
