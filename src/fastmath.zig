@@ -1,5 +1,5 @@
 // Doc https://ziglang.org/documentation/master/#Vectors
-// Ref https://github.com/michal-z/zig-gamedev/blob/main/libs/zmath/zmath.zig
+// Ref https://github.com/michal-z/zig-gamedev/blob/main/libs/zmath/src/zmath.zig
 
 const std = @import("std");
 const Vector = std.meta.Vector;
