@@ -10,9 +10,9 @@ Kết quả hiện ở vùng `small models` (`retrofit` chưa khám phá, glove 
 
 * Làm hierarchical topic modeling (`docs/_5-text_mining.md`)
 
-* Nghịch `retrofit` với tiếng Việt?
+* Nghịch `retrofit` với tiếng Việt
 
-* Optimize nhân ma trận, vector với `openblas`. Cài đặt đúng theo nguyên bản `hogbatch`?
+* Optimize nhân ma trận, vector với `openblas`. Cài đặt đúng theo nguyên bản `hogbatch`
 
 
 #### [ >> DOING << ]
